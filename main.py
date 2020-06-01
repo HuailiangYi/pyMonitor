@@ -54,20 +54,35 @@ def get_app_status(app_list):
     :param app_list: 程序列表
     :return: 程序运行结果
     """
-    result = OrderedDict()
+    survival_app_dict = OrderedDict()
+    dead_app_dict = OrderedDict()
+
 
     for app in app_list:
         pid_list = get_process_id(app)
         pid_info_list = [get_process_info(pid)for pid in pid_list]
         if len(pid_info_list) == 0:
             """程序挂了"""
-            result[app] = {'pid_list': None, 'status': False }
+            dead_app_dict[app] = {'pid_list': None, 'status': False }
         else:
-            result[app] = {'pid_list': pid_info_list, 'status': True }
+            survival_app_dict[app] = {'pid_list': pid_info_list, 'status': True }
 
-    return result
+    return survival_app_dict, dead_app_dict
+
+
+def output_result(result):
+    print("总数：", len(result))
+    for key, value in result.items():
+        print(key, value)
 
 
 if __name__ == "__main__":
     app_list = [app[0] for app in read_config()]
-    print(get_app_status(app_list))
+    survival_app_dict, dead_app_dict = get_app_status(app_list)
+
+    print("#############正常运行的程序###############")
+    output_result(survival_app_dict)
+
+    print("############dump的程序#################")
+    output_result(dead_app_dict)
+
